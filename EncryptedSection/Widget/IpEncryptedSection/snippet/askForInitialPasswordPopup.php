@@ -18,3 +18,9 @@
         </div>
     </div>
 </div>
+<script>
+    $(document).ready(function(){
+        $('#password').val('jqueryXXval');
+        //alert("yes we are here");
+    });
+</script>

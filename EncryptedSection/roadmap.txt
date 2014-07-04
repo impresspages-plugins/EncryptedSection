@@ -23,3 +23,11 @@
 
 Must have a "decrypt" button in view: skin/default.php
 If clicked, then decrypt on client. Do *not* decrypt in WidgetController.generateHTML() !
+
+
+
+
+# Coding style
+
+Look at TODOs :-(
+Refactor the UI garbage out of IpEncryptionSection.js  (maybe use IpForms) 

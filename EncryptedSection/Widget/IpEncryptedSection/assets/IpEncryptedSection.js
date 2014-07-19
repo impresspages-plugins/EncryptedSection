@@ -38,7 +38,14 @@ var IpWidget_IpEncryptedSection;
             this.password = null;
             data.isLocked = true;
             this.data     = data;
-            //$widgetObject.css("background-color", "#CFC");
+
+            // jQueryUI tooltip for lock symbol
+            $widgetObject.find("#unlockSymbol").tooltip({
+                content: data.encrypted ? "Click to unlock this section." : "Click to set initial password.",
+                position: { my: "left center", at: "right+10 center"},
+                hide: 0  // hide immideately, no fade
+            });
+           
             $widgetObject.find("#unlockSymbol").click(
                 $.proxy(this.unlockSection, this, null)
             );
@@ -53,7 +60,7 @@ var IpWidget_IpEncryptedSection;
             this.password     = null;
             this.isLocked     = true;
             this.data.encrypted = "";
-            //this.askForInitialPassword();   //TOOD: make it configurable via admin settings, wheter to ask for password on add
+            this.askForInitialPassword();   //TOOD: make it configurable via admin settings, wheter to ask for password on add
         };
 
 
@@ -70,6 +77,7 @@ var IpWidget_IpEncryptedSection;
          * If the password is already stored in this session, then the section will be decrypted immidiately.
          */
         this.unlockSection = function(newPassword) {
+            $("#unlockSymbol").tooltip("close");
             console.log("unlockSection(data.encrypted='"+this.data.encrypted+"')");
             this.password = newPassword || this.password;
             if (this.password) {
@@ -77,8 +85,8 @@ var IpWidget_IpEncryptedSection;
                 try{
                     var plainText = decrypt(this.data, this.password);  // May throw exception if password is wrong.
                     this.isLocked = false;
-                    this.widgetObject.find('.ipsContent').html(plainText);
-                    //MAYBE: change background of .ipsContent
+                    this.widgetObject.find('.encryptedSection').html(plainText);
+                    //MAYBE: change background of .encryptedSection
                     this.initTinyMCE();
                 } catch (errorMsg) {
                     console.log("INFO: "+errorMsg);
@@ -108,9 +116,9 @@ var IpWidget_IpEncryptedSection;
          this.lockSection = function() {
              console.log("Lock section");
              
-             this.widgetObject.find('.ipsContent').tinymce().remove();
+             this.widgetObject.find('.encryptedSection').tinymce().remove();
              
-             var newPlaintText = this.widgetObject.find('.ipsContent').html();
+             var newPlaintText = this.widgetObject.find('.encryptedSection').html();
              var encryptedData = encrypt(newPlaintText, this.password);
              console.log('EncryptedSection.lockSection(): data.encrypted='+encryptedData.encrypted);
              // Only send the encrypted data to the server! And we do not reload the widget, so that the user can keep editing.
@@ -143,11 +151,12 @@ var IpWidget_IpEncryptedSection;
             customTinyMceConfig.setup = function(editor) { 
                 editor.addButton('lock', {
                     text: 'Lock',
-                    icon: false,
+                    icon: "save",  // 'mce-save' is a TinyMCE default icon from http://icomoon.io
+                    style: "background: #B00",
                     onclick: $.proxy(that.lockSection, that)
                 });
                 editor.on('change', $.proxy( function(evt) {
-                    var newPlaintText = widgetObject.find('.ipsContent').html();
+                    var newPlaintText = widgetObject.find('.encryptedSection').html();
                     var encryptedData = encrypt(newPlaintText, password);
                     console.log('EncryptedSection.onChange(): data.encrypted='+encryptedData.encrypted);
                     // Only send the encrypted data to the server! And we do not reload the widget, so that the user can keep editing.
@@ -155,8 +164,8 @@ var IpWidget_IpEncryptedSection;
                 }), that);
             };
             
-            this.widgetObject.find('.ipsContent').tinymce(customTinyMceConfig);
-            this.widgetObject.find('.ipsContent').focus();
+            this.widgetObject.find('.encryptedSection').tinymce(customTinyMceConfig);
+            this.widgetObject.find('.encryptedSection').focus();
             
         };
 
@@ -170,7 +179,7 @@ var IpWidget_IpEncryptedSection;
          *            salt: salt,                    // the salt used for the PKCS5.PBKDF2() function
          *            numIterations: numIterations,  // num iterations for that function
          *            iv:  iv,                       // the AES initial vector passed to cipher.start()
-         *            encrypted: encrypted           // the encryptedText in HEX representation
+         *            encrypted: encrypted           // the encryptedText
          *         }
          * 
          */
@@ -344,7 +353,7 @@ var IpWidget_IpEncryptedSection;
             };
             passwordInput.keyup(evtData, checkPassword);
             
-            // setPassword on Confirm if at aleast one char was entered.
+            // onConfirm try to unlock section with the provided password.
             confirmButton.prop('disabled', true);
             confirmButton.off(); // ensure we will not bind second time
             confirmButton.on('click', $.proxy(function() {
@@ -354,8 +363,7 @@ var IpWidget_IpEncryptedSection;
             
             // open modal popup with bootstrap
             popup.modal({
-                backdrop : "static"
-                //keyboard : false
+                backdrop : "static"  // no close with click outside. Close with ESC is allowed.
             }); 
             passwordInput.focus();
         };

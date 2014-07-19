@@ -2,13 +2,13 @@
  * diagonal stripes for encrypted section 
  * taken from here: http://css-tricks.com/stripes-css/
  */
-.encryptedBg {
+.encryptedSection {
     background-image: -webkit-gradient(linear, left top, right bottom, color-stop(0, #eee), color-stop(0.25, #eee), color-stop(0.25, #ddd), color-stop(0.5, #ddd), color-stop(0.5, #eee), color-stop(0.75, #eee), color-stop(0.75, #ddd));
     background-image: -webkit-linear-gradient(left top, #eee 0%, #eee 25%, #ddd 25%, #ddd 50%, #eee 50%, #eee 75%, #ddd 75%);
     background-image: -moz-linear-gradient(left top, #eee 0%, #eee 25%, #ddd 25%, #ddd 50%, #eee 50%, #eee 75%, #ddd 75%);
     background-image: -ms-linear-gradient(left top, #eee 0%, #eee 25%, #ddd 25%, #ddd 50%, #eee 50%, #eee 75%, #ddd 75%);
     background-image: -o-linear-gradient(left top, #eee 0%, #eee 25%, #ddd 25%, #ddd 50%, #eee 50%, #eee 75%, #ddd 75%);
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#eeeeee', endColorstr='#dddddd',GradientType=0 ); / IE6-8 */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#eeeeee', endColorstr='#dddddd',GradientType=0 ); /* IE6-8 */
     background-image: linear-gradient(left top, #eee 0%, #eee 25%, #ddd 25%, #ddd 50%, #eee 50%, #eee 75%, #ddd 75%);
     background-size: 30px 30px;
     width:100%;
@@ -22,4 +22,13 @@
     border: solid 0.08em #000;
     border-radius: .1em;
     cursor: pointer;
+}
+
+/** make the lock symbol glow, when hover over the widget */
+.encryptedSection:hover span#unlockSymbol {
+    background: #F66;
+}
+
+.mce-i-lock2:before {
+    content: "\e600"
 }
